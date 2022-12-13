@@ -1,0 +1,76 @@
+version: '3.3'
+name: FlashXDocker # This field requires docker-compose V2, docker-desktop V4
+services:
+  postgres:
+    image: postgres:12
+    container_name: postgres-12
+    restart: always
+    environment:
+      - POSTGRES_USER=flash
+      - POSTGRES_PASSWORD=12345678
+    ports:
+      - '5432:5432'
+    volumes: 
+      - D:/AppData/Docker/Postgres:/var/lib/postgresql/data
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-8
+    # cap_add:
+    #   - SYS_NICE
+    command: --default-authentication-plugin=mysql_native_password # Allow authen with native password for legacy system
+    restart: always
+    environment:
+      - MYSQL_DATABASE=mysqldb
+      - MYSQL_ROOT_PASSWORD=12345678
+      - MYSQL_USER=flash # Must Grant All DBA Privileges (Except: Usage) and Schema Privilages (% All - Table Privilages + Other Privilages) to MAKE THIS USER LIKE ROOT
+      - MYSQL_PASSWORD=12345678
+    ports:
+      - '3306:3306'
+    volumes:
+      - D:/AppData/Docker/MySQL:/var/lib/mysql
+      # - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql # Not sure
+  
+  rabbitmq:
+    image: rabbitmq:3.11-management # Using xx-management tag to have built-in UI management
+    container_name: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=flash # Default system user/pass is guest/guest
+      - RABBITMQ_DEFAULT_PASS=12345678
+    ports:
+      - '5672:5672' # AMQP protocol port
+      - '15672:15672' # HTTP management UI
+    volumes:
+      - D:/AppData/Docker/RabbitMQ:/var/lib/rabbitmq
+
+  ibmmq:
+    image: ibmcom/mq:9.2.0.0-r1 # 9.2.2.0-r1 Error when restarting web service
+    container_name: ibmmq
+    restart: always
+    environment:
+      - LICENSE=accept
+      - MQ_QMGR_NAME=QM1
+    ports:
+      - "1414:1414"
+      - "9443:9443"
+    volumes:
+      - D:/AppData/Docker/IBMMQ:/var/mqm
+    stdin_open: true
+    tty: true
+    # hostname: mq
+
+  redis: # Execute Redis CLI: docker exec -it redis redis-cli
+    image: redis:7.0
+    container_name: redis
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+    # command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - D:/AppData/Docker/Redis:/data
+    
+volumes:
+  FlashXDocker:
+    driver: local
