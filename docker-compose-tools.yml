@@ -1,0 +1,22 @@
+version: '3.3'
+name: flashxtools # This field requires docker-compose V2, docker-desktop V4 | name must be lower case, ex: flashxdocker
+services:
+  # Official Github: https://github.com/gchq/CyberChef 
+  # Live Demo: https://gchq.github.io/CyberChef/ 
+  # https://github.com/mpepping/docker-cyberchef | https://hub.docker.com/r/mpepping/cyberchef
+  cyberChef:
+    image: mpepping/cyberchef:latest
+    container_name: cyberChef
+    restart: unless-stopped # Ignore using restart: always to save resource
+    ports:
+      - '7000:8000'
+
+  # Official GitHub: https://github.com/excalidraw/excalidraw 
+  # https://hub.docker.com/r/excalidraw/excalidraw 
+  excalidraw:
+    image: excalidraw/excalidraw:latest
+    container_name: excalidraw
+    restart: unless-stopped
+    ports:
+      - '7001:80'
+  
