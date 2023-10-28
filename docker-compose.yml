@@ -1,10 +1,10 @@
 version: '3.3'
-name: FlashXDocker # This field requires docker-compose V2, docker-desktop V4
+name: flashxdocker # This field requires docker-compose V2, docker-desktop V4 | name must be lower case, ex: flashxdocker
 services:
   postgres:
     image: postgres:12
     container_name: postgres-12
-    restart: always
+    restart: unless-stopped # Ignore using restart: always to save resource
     environment:
       - POSTGRES_USER=flash
       - POSTGRES_PASSWORD=12345678
@@ -18,7 +18,7 @@ services:
     # cap_add:
     #   - SYS_NICE
     command: --default-authentication-plugin=mysql_native_password # Allow authen with native password for legacy system
-    restart: always
+    restart: unless-stopped
     environment:
       - MYSQL_DATABASE=mysqldb
       - MYSQL_ROOT_PASSWORD=12345678
@@ -33,7 +33,7 @@ services:
   rabbitmq:
     image: rabbitmq:3.11-management # Using xx-management tag to have built-in UI management
     container_name: rabbitmq
-    restart: always
+    restart: unless-stopped
     environment:
       - RABBITMQ_DEFAULT_USER=flash # Default system user/pass is guest/guest
       - RABBITMQ_DEFAULT_PASS=12345678
@@ -46,7 +46,7 @@ services:
   ibmmq:
     image: ibmcom/mq:9.2.0.0-r1 # 9.2.2.0-r1 Error when restarting web service
     container_name: ibmmq
-    restart: always
+    restart: unless-stopped
     environment:
       - LICENSE=accept
       - MQ_QMGR_NAME=QM1
@@ -62,7 +62,7 @@ services:
   redis: # Execute Redis CLI: docker exec -it redis redis-cli
     image: redis:7.0
     container_name: redis
-    restart: always
+    restart: unless-stopped
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
@@ -73,7 +73,7 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.2.3
-    restart: on-failure
+    restart: unless-stopped # Default for this service is: on-failure -> Using unless-stopped to save resource
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -84,7 +84,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.2.3
-    restart: on-failure
+    restart: unless-stopped # Default for this service is: on-failure -> Using unless-stopped to save resource
     hostname: kafka
     container_name: kafka
     depends_on:
@@ -101,5 +101,5 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     
 volumes:
-  FlashXDocker:
+  flashxdocker:
     driver: local
